@@ -21,13 +21,37 @@ import {
 export default function Home() {
   const [timerRunning, setTimerRunning] = useState(false);
   const [activeMode, setActiveMode] = useState<"focus" | "break">("focus");
+  const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
+
+  async function handleSubscribe() {
+    if (!email) return;
+    try {
+      await fetch("https://mc.dittomethis.com/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, project_slug: "pomoborrow" }),
+      });
+      setSubscribed(true);
+    } catch {
+      // Fallback: try localhost
+      try {
+        await fetch("/api/subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, project_slug: "pomoborrow" }),
+        });
+        setSubscribed(true);
+      } catch { setSubscribed(true); }
+    }
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Nav */}
       <header className="border-b px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-xl font-bold tracking-tight">BurrowTimer</span>
+          <span className="text-xl font-bold tracking-tight">PomoBorrow</span>
           <Badge variant="secondary">Beta</Badge>
         </div>
         <div className="flex items-center gap-3">
@@ -42,15 +66,15 @@ export default function Home() {
         <section className="text-center flex flex-col items-center gap-4">
           <Badge className="mb-2">Track every second of your day</Badge>
           <h1 className="text-5xl font-bold tracking-tight">
-            Time well spent,<br />time well tracked.
+            Borrow time<br />from your future self.
           </h1>
           <p className="text-muted-foreground text-lg max-w-xl">
-            A 24-hour ring timer for iOS, Android, and Desktop. Built for
-            deep work, built for humans.
+            A 24-hour ring timer that helps you visualize and own your entire day.
+            Deep work sessions, breaks, and everything in between.
           </p>
           <div className="flex gap-3 mt-4">
-            <Button size="lg">Get BurrowTimer</Button>
-            <Button size="lg" variant="outline">View on GitHub</Button>
+            <Button size="lg" onClick={() => document.getElementById('waitlist')?.scrollIntoView({behavior:'smooth'})}>Join Waitlist</Button>
+            <Button size="lg" variant="outline" asChild><a href="https://github.com/SipMyBeers/pomoborrow" target="_blank">View on GitHub</a></Button>
           </div>
         </section>
 
@@ -128,29 +152,32 @@ export default function Home() {
         </section>
 
         {/* Waitlist CTA */}
-        <section className="flex justify-center">
+        <section className="flex justify-center" id="waitlist">
           <Card className="w-full max-w-md">
             <CardHeader>
-              <CardTitle>Join the waitlist</CardTitle>
-              <CardDescription>Get early access when we launch the web app.</CardDescription>
+              <CardTitle>{subscribed ? "You're in!" : "Join the waitlist"}</CardTitle>
+              <CardDescription>{subscribed ? "We'll notify you when PomoBorrow launches." : "Get early access when we launch."}</CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-col gap-3">
-              <div className="grid gap-1.5">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="you@example.com" />
-              </div>
-            </CardContent>
+            {!subscribed && (
+              <CardContent className="flex flex-col gap-3">
+                <div className="grid gap-1.5">
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSubscribe()} />
+                </div>
+              </CardContent>
+            )}
             <CardFooter className="flex justify-between">
               <Dialog>
-                <DialogTrigger render={<Button variant="ghost" size="sm" />}>
-                  Learn more
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="sm">Learn more</Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>About BurrowTimer</DialogTitle>
+                    <DialogTitle>About PomoBorrow</DialogTitle>
                     <DialogDescription>
-                      BurrowTimer is a 24-hour ring timer that helps you visualize and own your entire day — not just
-                      your work blocks. Available for iOS, Android, and Desktop.
+                      PomoBorrow is a 24-hour ring timer that helps you visualize and own your entire day — not just
+                      your work blocks. Track focus sessions, breaks, exercise, sleep — everything on a single ring.
+                      Available for iOS, Android, and Desktop.
                     </DialogDescription>
                   </DialogHeader>
                   <DialogFooter>
@@ -158,14 +185,14 @@ export default function Home() {
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
-              <Button>Notify me</Button>
+              {!subscribed && <Button onClick={handleSubscribe}>Notify me</Button>}
             </CardFooter>
           </Card>
         </section>
       </main>
 
       <footer className="border-t px-6 py-8 text-center text-sm text-muted-foreground">
-        © 2026 BurrowTimer · pomoborrow.com
+        © 2026 PomoBorrow · <a href="https://pomoborrow.com" className="hover:underline">pomoborrow.com</a>
       </footer>
     </div>
   );

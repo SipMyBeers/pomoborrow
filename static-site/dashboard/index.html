@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — PomoBorrow</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#09090b;--card:#18181b;--border:#27272a;--text:#fafafa;--muted:#a1a1aa;--primary:#e74c3c;--primary-dim:#c0392b;--green:#22c55e;--blue:#3b82f6}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+nav{border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;max-width:1200px;margin:0 auto}
+.logo{font-size:1.15rem;font-weight:800;letter-spacing:-.5px}
+.logo span{color:var(--primary)}
+.nav-links{display:flex;gap:4px}
+.nav-link{font-size:.8rem;padding:6px 14px;border-radius:6px;color:var(--muted);text-decoration:none;transition:all .15s}
+.nav-link:hover{color:var(--text);background:rgba(255,255,255,.04)}
+.nav-link.active{color:var(--text);background:rgba(255,255,255,.06)}
+.user-badge{font-size:.75rem;color:var(--muted);display:flex;align-items:center;gap:8px}
+.avatar{width:28px;height:28px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#fff}
+
+.container{max-width:1200px;margin:0 auto;padding:24px}
+.greeting{font-size:1.5rem;font-weight:700;margin-bottom:4px}
+.greeting-sub{font-size:.85rem;color:var(--muted);margin-bottom:28px}
+
+/* Stats row */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+@media(max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+.stat-value{font-size:1.8rem;font-weight:800;letter-spacing:-1px}
+.stat-label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+
+/* Sections */
+.section{margin-bottom:28px}
+.section-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.section-action{font-size:.7rem;color:var(--primary);cursor:pointer;text-transform:none;letter-spacing:0;font-weight:600}
+
+/* Device cards */
+.devices{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.device{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;display:flex;gap:14px;align-items:flex-start;transition:border-color .2s}
+.device:hover{border-color:var(--muted)}
+.device-icon{width:44px;height:44px;border-radius:10px;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.device-name{font-size:.9rem;font-weight:600}
+.device-meta{font-size:.7rem;color:var(--muted);margin-top:2px}
+.device-status{display:flex;align-items:center;gap:5px;font-size:.65rem;margin-top:6px}
+.dot{width:6px;height:6px;border-radius:50%}
+.dot.online{background:var(--green);box-shadow:0 0 6px var(--green)}
+.dot.offline{background:var(--muted)}
+.device-sync{font-size:.6rem;color:var(--muted);margin-top:4px}
+
+/* ACE section */
+.ace-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;position:relative;overflow:hidden}
+.ace-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--primary),var(--blue),var(--primary))}
+.ace-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.ace-title{font-size:1rem;font-weight:700}
+.ace-badge{font-size:.6rem;padding:3px 10px;border-radius:20px;background:rgba(231,76,60,.1);color:var(--primary);border:1px solid rgba(231,76,60,.2);font-weight:600}
+.ace-desc{font-size:.8rem;color:var(--muted);line-height:1.6;margin-bottom:16px}
+.ace-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.ace-metric{text-align:center;padding:12px;background:rgba(255,255,255,.02);border-radius:8px}
+.ace-metric-value{font-size:1.3rem;font-weight:700}
+.ace-metric-label{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.ace-patterns{margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+.ace-pattern{display:flex;align-items:center;gap:8px;font-size:.75rem;color:var(--muted);padding:4px 0}
+.ace-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* Quick timer */
+.quick-timer{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;text-align:center}
+.qt-time{font-size:3rem;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-2px}
+.qt-mode{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px}
+.qt-btn{padding:10px 32px;border-radius:8px;border:none;background:var(--primary);color:#fff;font-size:.85rem;font-weight:700;cursor:pointer;font-family:inherit;transition:background .2s}
+.qt-btn:hover{background:var(--primary-dim)}
+.qt-btn.secondary{background:transparent;border:1px solid var(--border);color:var(--muted)}
+.qt-link{font-size:.75rem;color:var(--primary);margin-top:12px;display:inline-block;text-decoration:none}
+
+/* Download */
+.downloads{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.dl-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:all .2s}
+.dl-card:hover{border-color:var(--primary);background:rgba(231,76,60,.03)}
+.dl-icon{font-size:1.5rem;margin-bottom:8px}
+.dl-name{font-size:.85rem;font-weight:600;margin-bottom:2px}
+.dl-desc{font-size:.7rem;color:var(--muted)}
+.dl-badge{display:inline-block;font-size:.55rem;padding:2px 8px;border-radius:10px;background:rgba(231,76,60,.1);color:var(--primary);margin-top:8px}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Pomo<span>Borrow</span></div>
+  <div class="nav-links">
+    <a href="/dashboard/" class="nav-link active">Dashboard</a>
+    <a href="/app/" class="nav-link">Timer</a>
+  </div>
+  <div class="user-badge">
+    <span id="user-name"></span>
+    <div class="avatar" id="user-avatar"></div>
+    <span style="cursor:pointer;font-size:.7rem;color:var(--muted)" onclick="logout()">Log out</span>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="greeting" id="greeting">Good morning</div>
+  <div class="greeting-sub" id="greeting-sub">Here's your focus overview</div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat"><div class="stat-value" id="stat-sessions">0</div><div class="stat-label">Sessions Today</div></div>
+    <div class="stat"><div class="stat-value" id="stat-focus">0m</div><div class="stat-label">Focus Time</div></div>
+    <div class="stat"><div class="stat-value" id="stat-streak">0</div><div class="stat-label">Day Streak</div></div>
+    <div class="stat"><div class="stat-value" id="stat-devices">0</div><div class="stat-label">Devices</div></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px">
+    <!-- Quick Timer -->
+    <div class="quick-timer">
+      <div class="qt-mode" id="qt-mode">FOCUS</div>
+      <div class="qt-time" id="qt-time">25:00</div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:16px">
+        <button class="qt-btn" id="qt-btn" onclick="toggleTimer()">Start</button>
+        <button class="qt-btn secondary" onclick="resetTimer()">Reset</button>
+      </div>
+      <a href="/app/" class="qt-link">Open full timer →</a>
+    </div>
+
+    <!-- ACE Engine -->
+    <div class="ace-card">
+      <div class="ace-header">
+        <div class="ace-title">ACE — Autonomous Context Engine</div>
+        <div class="ace-badge" id="ace-level">Level 1</div>
+      </div>
+      <div class="ace-desc">Your personal AI learns focus patterns across all devices to optimize your schedule, predict energy levels, and suggest the best time to work.</div>
+      <div class="ace-metrics">
+        <div class="ace-metric"><div class="ace-metric-value" id="ace-score">0</div><div class="ace-metric-label">Focus Score</div></div>
+        <div class="ace-metric"><div class="ace-metric-value" id="ace-sessions">0</div><div class="ace-metric-label">Training Data</div></div>
+        <div class="ace-metric"><div class="ace-metric-value" id="ace-accuracy">—</div><div class="ace-metric-label">Prediction</div></div>
+      </div>
+      <div class="ace-patterns" id="ace-patterns">
+        <div style="font-size:.65rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Learned Patterns</div>
+        <div style="font-size:.75rem;color:rgba(255,255,255,.2);font-style:italic">Complete more sessions to train your ACE</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Connected Devices -->
+  <div class="section">
+    <div class="section-title">
+      Connected Devices
+      <span class="section-action" onclick="addDevice()">+ Add Device</span>
+    </div>
+    <div class="devices" id="devices"></div>
+  </div>
+
+  <!-- Download Apps -->
+  <div class="section">
+    <div class="section-title">Download PomoBorrow</div>
+    <div class="downloads">
+      <div class="dl-card" onclick="window.open('https://github.com/SipMyBeers/pomoborrow/releases')">
+        <div class="dl-icon">🖥</div>
+        <div class="dl-name">macOS</div>
+        <div class="dl-desc">Native desktop app</div>
+        <div class="dl-badge">Tauri • 5MB</div>
+      </div>
+      <div class="dl-card">
+        <div class="dl-icon">🪟</div>
+        <div class="dl-name">Windows</div>
+        <div class="dl-desc">Desktop app</div>
+        <div class="dl-badge">Coming soon</div>
+      </div>
+      <div class="dl-card">
+        <div class="dl-icon">📱</div>
+        <div class="dl-name">iOS</div>
+        <div class="dl-desc">iPhone & iPad</div>
+        <div class="dl-badge">Coming soon</div>
+      </div>
+      <div class="dl-card">
+        <div class="dl-icon">🤖</div>
+        <div class="dl-name">Android</div>
+        <div class="dl-desc">Phone & tablet</div>
+        <div class="dl-badge">Coming soon</div>
+      </div>
+      <div class="dl-card" onclick="window.location.href='/app/'">
+        <div class="dl-icon">🌐</div>
+        <div class="dl-name">Web App</div>
+        <div class="dl-desc">Use in browser</div>
+        <div class="dl-badge">Available now</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Auth check
+const session=JSON.parse(localStorage.getItem('pb-session')||'null');
+if(!session||!session.loggedIn){window.location.href='/login/'}
+
+// Populate user info
+if(session){
+  document.getElementById('user-name').textContent=session.name||session.email;
+  document.getElementById('user-avatar').textContent=(session.name||session.email).charAt(0).toUpperCase();
+  const hour=new Date().getHours();
+  document.getElementById('greeting').textContent=hour<12?'Good morning, '+session.name:hour<17?'Good afternoon, '+session.name:'Good evening, '+session.name;
+}
+
+// Ensure current browser is registered as a device
+if(session&&session.devices){
+  const hasBrowser=session.devices.some(d=>d.type==='browser');
+  if(!hasBrowser){
+    session.devices.push({id:'browser-'+Math.random().toString(36).substring(2,8),name:'This Browser',type:'browser',lastSeen:Date.now(),os:navigator.platform||navigator.userAgent.substring(0,30)});
+    localStorage.setItem('pb-session',JSON.stringify(session));
+  }
+  // Update last seen for current device
+  session.devices.forEach(d=>{if(d.type==='browser')d.lastSeen=Date.now()});
+  localStorage.setItem('pb-session',JSON.stringify(session));
+}
+
+// Load stats from timer data
+const timerSessions=JSON.parse(localStorage.getItem('pomoborrow-sessions')||'[]');
+const today=new Date();today.setHours(0,0,0,0);
+const todaySessions=timerSessions.filter(s=>s.startedAt>=today.getTime()&&s.mode==='focus'&&s.completed);
+document.getElementById('stat-sessions').textContent=todaySessions.length;
+document.getElementById('stat-focus').textContent=Math.round(todaySessions.reduce((s,t)=>s+t.duration,0)/60)+'m';
+
+// Streak
+let streak=0;
+const daySet=new Set();
+timerSessions.filter(s=>s.mode==='focus'&&s.completed).forEach(s=>{const d=new Date(s.startedAt);daySet.add(d.toDateString())});
+for(let i=0;i<365;i++){const d=new Date();d.setDate(d.getDate()-i);if(daySet.has(d.toDateString()))streak++;else if(i>0)break}
+document.getElementById('stat-streak').textContent=streak;
+
+// Devices
+const devices=session?session.devices||[]:[];
+document.getElementById('stat-devices').textContent=devices.length;
+const devIcons={browser:'🌐',desktop:'🖥',mobile:'📱',tablet:'📱'};
+document.getElementById('devices').innerHTML=devices.length?devices.map(d=>{
+  const age=Date.now()-d.lastSeen;
+  const online=age<300000; // 5 min
+  const lastSeen=online?'Active now':age<3600000?Math.round(age/60000)+'m ago':age<86400000?Math.round(age/3600000)+'h ago':'Offline';
+  return `<div class="device">
+    <div class="device-icon">${devIcons[d.type]||'💻'}</div>
+    <div>
+      <div class="device-name">${d.name||d.type}</div>
+      <div class="device-meta">${d.os||d.type}</div>
+      <div class="device-status"><div class="dot ${online?'online':'offline'}"></div>${lastSeen}</div>
+      <div class="device-sync">Synced ${d.sessions||0} sessions</div>
+    </div>
+  </div>`;
+}).join(''):'<div style="font-size:.8rem;color:var(--muted);padding:20px;text-align:center">No devices connected yet. Use the web app or download the desktop app.</div>';
+
+// ACE status
+const ace=session?session.ace||{}:{};
+const totalSessions=timerSessions.filter(s=>s.mode==='focus'&&s.completed).length;
+const aceLevel=Math.floor(totalSessions/10)+1;
+document.getElementById('ace-level').textContent='Level '+aceLevel;
+document.getElementById('ace-score').textContent=Math.min(totalSessions*5,100);
+document.getElementById('ace-sessions').textContent=totalSessions;
+if(totalSessions>=5){
+  document.getElementById('ace-accuracy').textContent=Math.min(50+totalSessions*2,95)+'%';
+  // Show learned patterns
+  const patterns=[];
+  const hourCounts={};
+  timerSessions.filter(s=>s.mode==='focus'&&s.completed).forEach(s=>{
+    const h=new Date(s.startedAt).getHours();
+    hourCounts[h]=(hourCounts[h]||0)+1;
+  });
+  const peakHour=Object.entries(hourCounts).sort((a,b)=>b[1]-a[1])[0];
+  if(peakHour)patterns.push({color:'var(--primary)',text:'Peak focus: '+peakHour[0]+':00 ('+peakHour[1]+' sessions)'});
+  const avgDuration=Math.round(timerSessions.filter(s=>s.mode==='focus'&&s.completed).reduce((s,t)=>s+t.duration,0)/totalSessions/60);
+  if(avgDuration)patterns.push({color:'var(--blue)',text:'Avg session: '+avgDuration+' minutes'});
+  if(streak>2)patterns.push({color:'var(--green)',text:'Consistent: '+streak+' day streak detected'});
+  if(patterns.length){
+    document.getElementById('ace-patterns').innerHTML='<div style="font-size:.65rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Learned Patterns</div>'+patterns.map(p=>'<div class="ace-pattern"><div class="ace-dot" style="background:'+p.color+'"></div>'+p.text+'</div>').join('');
+  }
+}
+
+// Quick timer
+let qtRunning=false,qtSeconds=25*60,qtInterval=null;
+function updateQT(){document.getElementById('qt-time').textContent=String(Math.floor(qtSeconds/60)).padStart(2,'0')+':'+String(qtSeconds%60).padStart(2,'0')}
+function toggleTimer(){
+  if(qtRunning){qtRunning=false;clearInterval(qtInterval);document.getElementById('qt-btn').textContent='Start'}
+  else{qtRunning=true;document.getElementById('qt-btn').textContent='Pause';qtInterval=setInterval(()=>{if(qtSeconds>0){qtSeconds--;updateQT()}else{clearInterval(qtInterval);qtRunning=false;document.getElementById('qt-btn').textContent='Start';if(Notification.permission==='granted')new Notification('Session complete!')}},1000)}
+}
+function resetTimer(){qtRunning=false;clearInterval(qtInterval);qtSeconds=25*60;updateQT();document.getElementById('qt-btn').textContent='Start'}
+function addDevice(){alert('To add a device:\n\n1. Download PomoBorrow on the new device\n2. Log in with '+session.email+'\n3. It will appear here automatically')}
+function logout(){localStorage.removeItem('pb-session');window.location.href='/'}
+if(Notification.permission==='default')Notification.requestPermission();
+</script>
+</body>
+</html>
